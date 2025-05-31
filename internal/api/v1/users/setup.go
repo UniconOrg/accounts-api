@@ -7,21 +7,11 @@ import (
 	roles "accounts/internal/db/postgres/role"
 	users "accounts/internal/db/postgres/users"
 
-	"fmt"
-
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func SetupUsersModule(app *gin.Engine) {
-
-	db, err := gorm.Open(postgres.Open(settings.Settings.POSTGRES_DSN), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-
-	fmt.Println(db)
+func SetupUsersModule(app *gin.Engine, db *gorm.DB) {
 
 	service := services.NewUsersService(
 		users.NewUserPostgresRepository(db),

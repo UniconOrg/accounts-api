@@ -2,7 +2,6 @@ package emails
 
 import (
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"accounts/internal/api/v1/emails/domain/services"
@@ -20,12 +19,7 @@ import (
 	users "accounts/internal/db/postgres/users"
 )
 
-func SetupEmailsModule(app *gin.Engine) {
-
-	db, err := gorm.Open(postgres.Open(settings.Settings.POSTGRES_DSN), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
+func SetupEmailsModule(app *gin.Engine, db *gorm.DB) {
 
 	service := services.NewEmailsService(
 		emails.NewEmailPostgresRepository(db),

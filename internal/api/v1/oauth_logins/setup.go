@@ -8,7 +8,6 @@ import (
 	"accounts/internal/infrastucture/oauth/google/repositories"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	login_methods "accounts/internal/db/postgres/login_methods"
@@ -20,12 +19,7 @@ import (
 	utils_controller "accounts/internal/common/controllers"
 )
 
-func SetupOAuthModule(r *gin.Engine) {
-	// infrastructure
-	db, err := gorm.Open(postgres.Open(settings.Settings.POSTGRES_DSN), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
+func SetupOAuthModule(r *gin.Engine, db *gorm.DB) {
 
 	// repositories
 	google_repository := repositories.NewOAuthGoogleRepository(

@@ -18,6 +18,8 @@ import (
 	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
 	"github.com/gin-gonic/gin"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var Server *fiber.App
@@ -43,11 +45,16 @@ func setUpRouter() *gin.Engine {
 	//app.Use(middlewares.CatcherMiddleware)
 	app.Use(middlewares.LoggerMiddleware())
 
+	db, err := gorm.Open(postgres.Open(settings.Settings.POSTGRES_DSN), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
 	health.SetupHealthModule(app)
-	roles.SetupRolesModule(app)
-	users.SetupUsersModule(app)
-	emails.SetupEmailsModule(app)
-	refreshtokens.SetupRefreshTokensModule(app)
-	oauth_logins.SetupOAuthModule(app)
+	roles.SetupRolesModule(app, db)
+	users.SetupUsersModule(app, db)
+	emails.SetupEmailsModule(app, db)
+	refreshtokens.SetupRefreshTokensModule(app, db)
+	oauth_logins.SetupOAuthModule(app, db)
 	return app
 }
