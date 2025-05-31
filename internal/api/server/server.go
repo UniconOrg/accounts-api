@@ -8,11 +8,14 @@ import (
 	refreshtokens "accounts/internal/api/v1/refresh_tokens"
 	"accounts/internal/api/v1/roles"
 	"accounts/internal/api/v1/users"
+	"os"
 
 	"accounts/internal/common/middlewares"
 	"accounts/internal/core/settings"
 	"fmt"
 
+	"github.com/aws/aws-lambda-go/lambda"
+	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
 	"github.com/gin-gonic/gin"
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,6 +25,11 @@ var Server *fiber.App
 func Run() {
 
 	app := setUpRouter()
+
+	if _, inLambda := os.LookupEnv("AWS_LAMBDA_FUNCTION_NAME"); inLambda {
+		lambda.Start(ginadapter.NewV2(app).ProxyWithContext)
+		return
+	}
 
 	app.Run(fmt.Sprintf(":%d", settings.Settings.PORT))
 }

@@ -28,7 +28,7 @@ func SetupRolesModule(app *gin.Engine) {
 	rolesController := controllers.NewRolesController(*rolesService)
 
 	// Rutas de users
-	roles := app.Group("/api/v1/roles")
+	roles := app.Group(settings.Settings.BASE_PATH + "/api/v1/roles")
 
 	roles.POST("", rolesController.SignUp)
 	roles.GET("", rolesController.List)

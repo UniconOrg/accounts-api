@@ -31,7 +31,7 @@ func SetupUsersModule(app *gin.Engine) {
 	controller := controllers.NewUsersController(*service)
 
 	// Rutas de users
-	group := app.Group("/api/v1/users")
+	group := app.Group(settings.Settings.BASE_PATH + "/api/v1/users")
 
 	group.POST("", controller.Create)
 	group.GET("", controller.List)

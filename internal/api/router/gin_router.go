@@ -8,7 +8,11 @@ import (
 )
 
 func NewRouter() *gin.Engine {
-	r := gin.Default()
+	r := gin.New()
+
+	r.RedirectTrailingSlash = true
+	r.RedirectFixedPath = true
+	r.Use(gin.Recovery())
 
 	r.Use(middlewares.RequestLogMiddleware())
 

@@ -41,7 +41,7 @@ func SetupRefreshTokensModule(router *gin.Engine) {
 	// controller
 	controller := controllers.NewRefreshTokensController(service)
 
-	refresh := router.Group("/api/v1/refresh-jwt")
+	refresh := router.Group(settings.Settings.BASE_PATH + "/api/v1/refresh-jwt")
 
 	refresh.GET("", controller.Create)
 

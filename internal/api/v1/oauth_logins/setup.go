@@ -59,7 +59,7 @@ func SetupOAuthModule(r *gin.Engine) {
 	cntr := controllers.NewOAuthController(serv)
 
 	// routes
-	oauths := r.Group("/api/v1/platforms")
+	oauths := r.Group(settings.Settings.BASE_PATH + "/api/v1/platforms")
 
 	oauths.GET("/link/google", cntr.LinkGoogle)
 	oauths.POST("/token/google", cntr.TokenGoogle)
