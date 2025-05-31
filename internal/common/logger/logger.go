@@ -23,12 +23,31 @@ func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	sessionID, _ := entry.Data["caller_id"].(string)
 	path, _ := entry.Data["path"].(string)
 
+	// Crear el log con el formato especificado y colores
+	log := fmt.Sprintf(
+		"%s | %s | %s | %s | %s | %s:%d - %s\n",
+		time.Now().Format("2006-01-02 15:04:05"),
+		levelFormatter(entry.Level),
+		requestID,
+		sessionID,
+		path,
+		entry.Caller.Function,
+		entry.Caller.Line,
+		entry.Message,
+	)
+
+	return []byte(log), nil
+}
+
+func levelFormatter(level logrus.Level) string {
+
 	var levelColor string
+	var resetColor string
 
 	if settings.Settings.COLORED_LOG {
 
 		// Colores ANSI para diferentes niveles
-		switch entry.Level {
+		switch level {
 		case logrus.DebugLevel:
 			levelColor = "\033[36m" // Cyan
 		case logrus.InfoLevel:
@@ -40,22 +59,11 @@ func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 		default:
 			levelColor = "\033[0m" // Reset
 		}
+
+		resetColor = "\033[0m"
 	}
 
-	// Crear el log con el formato especificado y colores
-	log := fmt.Sprintf(
-		"%s | %s%s\033[0m | %s | %s | %s | %s:%d - %s\n",
-		time.Now().Format("2006-01-02 15:04:05"),
-		levelColor, entry.Level.String(), // Nivel con color
-		requestID,
-		sessionID,
-		path,
-		entry.Caller.Function,
-		entry.Caller.Line,
-		entry.Message,
-	)
-
-	return []byte(log), nil
+	return fmt.Sprintf("%s%s%s", levelColor, level.String(), resetColor)
 }
 
 // globalLogger es el logger principal
