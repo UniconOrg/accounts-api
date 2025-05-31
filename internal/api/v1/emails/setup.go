@@ -45,7 +45,7 @@ func SetupEmailsModule(app *gin.Engine) {
 	controller := controllers.NewEmailsController(*service)
 
 	// Rutas de users
-	group := app.Group(settings.Settings.BASE_PATH + "/api/v1/emails")
+	group := app.Group(settings.Settings.ROOT_PATH + "/api/v1/emails")
 
 	group.POST("/signup", controller.SignUp)
 	group.POST("/signup/resend-code", controller.SignUpResendCode)

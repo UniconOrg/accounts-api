@@ -27,6 +27,7 @@ func Run() {
 	app := setUpRouter()
 
 	if _, inLambda := os.LookupEnv("AWS_LAMBDA_FUNCTION_NAME"); inLambda {
+		fmt.Println("Running in Lambda")
 		lambda.Start(ginadapter.NewV2(app).ProxyWithContext)
 		return
 	}

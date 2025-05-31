@@ -12,7 +12,7 @@ func SetupHealthModule(app *gin.Engine) {
 	healthController := controllers.NewHealthController()
 
 	// Rutas de health
-	health := app.Group(settings.Settings.BASE_PATH + "/health")
+	health := app.Group(settings.Settings.ROOT_PATH + "/health")
 
 	health.GET("", healthController.GetHealth)
 }

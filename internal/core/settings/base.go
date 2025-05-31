@@ -16,7 +16,7 @@ type Config struct {
 	PORT        int    `required:"false" default:"8000"`
 	TIMESTAMP   string `required:"false"`
 	APP_NAME    string `required:"false" default:"accounts"`
-	BASE_PATH   string `required:"false" default:""`
+	ROOT_PATH   string `required:"false" default:""`
 
 	// Database
 	POSTGRES_DSN string `required:"true"`
