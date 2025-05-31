@@ -9,17 +9,10 @@ import (
 	postgres_refresh_tokens "accounts/internal/db/postgres/refresh_tokens"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func SetupRefreshTokensModule(router *gin.Engine) {
-
-	// Connections Infrastructure
-	db, err := gorm.Open(postgres.Open(settings.Settings.POSTGRES_DSN), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
+func SetupRefreshTokensModule(router *gin.Engine, db *gorm.DB) {
 
 	jwt_controller := jwt_controller.JWTController{
 		PublicKey:  settings.Settings.PUBLIC_KEY_JWT,
