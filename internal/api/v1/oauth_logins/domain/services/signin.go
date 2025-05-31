@@ -297,7 +297,7 @@ func (s *OAuthService) SignInGoogle(ctx context.Context, code, role string) util
 		entry.Info("Refresh Token found")
 	}
 
-	result := s.generateTokens(login_ent, refreshs_ent)
+	result := s.generateTokens(ctx, login_ent, refreshs_ent)
 
 	if result.Err != nil {
 		return utils.Responses[entities.SignInResponse]{
@@ -345,11 +345,11 @@ func (s OAuthService) createRefreshToken(ctx context.Context, login login_method
 	}
 }
 
-func (s OAuthService) generateTokens(login login_methods.LoginMethod, refreshToken refreshs.RefreshToken) utils.Either[GenerateTokensFlow] {
+func (s OAuthService) generateTokens(ctx context.Context, login login_methods.LoginMethod, refreshToken refreshs.RefreshToken) utils.Either[GenerateTokensFlow] {
 
-	jwt := login.ToJWT(s.jwt_controller)
+	jwt := login.ToJWT(ctx, s.jwt_controller)
 
-	refresh_token := refreshToken.ToJWT(s.jwt_controller)
+	refresh_token := refreshToken.ToJWT(ctx, s.jwt_controller)
 
 	return utils.Either[GenerateTokensFlow]{Data: GenerateTokensFlow{
 		jwt:           jwt,

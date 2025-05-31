@@ -15,7 +15,7 @@ func (s *RefreshTokensService) Validate(
 
 	entry.Info("Creating new JWT")
 
-	claim, err := s.jwt_controller.ValidateToken(refresh_token)
+	claim, err := s.jwt_controller.ValidateToken(ctx, refresh_token)
 	if err != nil {
 		entry.Error("Failed to validate token", err)
 		return utils.Responses[map[string]interface{}]{

@@ -17,6 +17,7 @@ type Config struct {
 	TIMESTAMP   string `required:"false"`
 	APP_NAME    string `required:"false" default:"accounts"`
 	ROOT_PATH   string `required:"false" default:""`
+	COLORED_LOG bool   `required:"false" default:"true"`
 
 	// Database
 	POSTGRES_DSN string `required:"true"`

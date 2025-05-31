@@ -150,7 +150,7 @@ func (s *EmailsService) Activate(
 		"is_removed": true,
 	})
 
-	result := s.generateTokens(login, refreshs_result.Data)
+	result := s.generateTokens(ctx, login, refreshs_result.Data)
 
 	if result.Err != nil {
 		return utils.Responses[entities.ActivateResponse]{
@@ -170,11 +170,11 @@ func (s *EmailsService) Activate(
 	}
 }
 
-func (s EmailsService) generateTokens(login logins.LoginMethod, refreshToken refreshs.RefreshToken) utils.Either[GenerateTokensFlow] {
+func (s EmailsService) generateTokens(ctx context.Context, login logins.LoginMethod, refreshToken refreshs.RefreshToken) utils.Either[GenerateTokensFlow] {
 
-	jwt := login.ToJWT(s.jwt_controller)
+	jwt := login.ToJWT(ctx, s.jwt_controller)
 
-	refresh_token := refreshToken.ToJWT(s.jwt_controller)
+	refresh_token := refreshToken.ToJWT(ctx, s.jwt_controller)
 
 	return utils.Either[GenerateTokensFlow]{Data: GenerateTokensFlow{
 		jwt:           jwt,

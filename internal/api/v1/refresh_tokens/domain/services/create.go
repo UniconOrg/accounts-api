@@ -17,7 +17,7 @@ func (s *RefreshTokensService) Create(
 
 	entry.Info("Creating new JWT")
 
-	claim, err := s.jwt_controller.ValidateToken(refresh_token)
+	claim, err := s.jwt_controller.ValidateToken(ctx, refresh_token)
 	if err != nil {
 		entry.Error("Failed to validate token", err)
 		return utils.Responses[entities.SignInResponse]{
@@ -99,7 +99,7 @@ func (s *RefreshTokensService) Create(
 
 	login_method_entity := login_ents[0]
 
-	jwt := login_method_entity.ToJWT(s.jwt_controller)
+	jwt := login_method_entity.ToJWT(ctx, s.jwt_controller)
 
 	return utils.Responses[entities.SignInResponse]{
 		StatusCode: 201,
