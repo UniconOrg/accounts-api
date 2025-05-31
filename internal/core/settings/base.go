@@ -16,6 +16,7 @@ type Config struct {
 	PORT        int    `required:"false" default:"8000"`
 	TIMESTAMP   string `required:"false"`
 	APP_NAME    string `required:"false" default:"accounts"`
+	ROOT_PATH   string `required:"false" default:""`
 
 	// Database
 	POSTGRES_DSN string `required:"true"`
@@ -45,6 +46,14 @@ type Config struct {
 	EMAIL_TEMPLATE_ACTIVATION_URL string `required:"true"`
 	EMAIL_TEMPLATE_RESET_URL      string `required:"true"`
 	EMAIL_TEMPLATE_WELCOME_URL    string `required:"true"`
+
+	// Google OAuth
+	GOOGLE_OAUTH_CLIENT_ID     string `required:"true"`
+	GOOGLE_OAUTH_CLIENT_SECRET string `required:"true"`
+	GOOGLE_OAUTH_REDIRECT_URI  string `required:"true"`
+
+	// OAuth
+	OAUTH_REDIRECT_URL string `required:"true"`
 }
 
 var Settings Config

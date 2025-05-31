@@ -33,16 +33,37 @@ services:
       timeout: 3s
       retries: 5
 
-  app:
+  app-lambda:
     depends_on:
       db:
         condition: service_healthy
       queue:
         condition: service_healthy
     build:
-      dockerfile: deployment/Dockerfile.deploy
+      context: .
+      dockerfile: docker_images/deploy/Dockerfile.deploy
     environment:
       - ENVIRONMENT=docker
+      - TYPE_HANDLER=LAMBDA
+    env_file:
+      - ./.envs/.env.docker
+    ports:
+      - 9000:8080
+    networks:
+      - "local-development"
+
+  app-api:
+    depends_on:
+      db:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: docker_images/local/Dockerfile.local
+    environment:
+      - ENVIRONMENT=docker
+      - TYPE_HANDLER=API
     env_file:
       - ./.envs/.env.docker
     ports:
