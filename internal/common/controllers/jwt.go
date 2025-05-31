@@ -22,23 +22,45 @@ type JWTController struct {
 }
 
 func normalizePEM(pemStr string) string {
-	// Si ya tiene saltos de línea, asumimos que está normalizado
+	const headerMarker = "-----BEGIN PRIVATE KEY-----"
+	const footerMarker = "-----END PRIVATE KEY-----"
+
+	// Si ya tiene saltos de línea, asumimos que está bien.
 	if strings.Contains(pemStr, "\n") {
 		return pemStr
 	}
 
-	// Intentamos detectar si es una línea larga con espacios
-	parts := strings.Split(pemStr, " ")
-	if len(parts) < 3 {
-		// Probablemente ya esté bien o está corrupto, lo regresamos igual
+	// Buscamos los índices exactos del encabezado y pie.
+	beginIdx := strings.Index(pemStr, headerMarker)
+	endIdx := strings.Index(pemStr, footerMarker)
+	if beginIdx == -1 || endIdx == -1 {
+		// No encontramos los marcadores completos: devolvemos tal cual.
 		return pemStr
 	}
 
-	header := parts[0]
-	footer := parts[len(parts)-1]
-	body := strings.Join(parts[1:len(parts)-1], "")
+	// La parte entre headerMarker y footerMarker (excluyendo los marcadores).
+	// Nota: +len(headerMarker) avanza justo después de "-----END PRIVATE KEY-----"
+	startOfBody := beginIdx + len(headerMarker)
+	bodyAndExtras := pemStr[startOfBody:endIdx]
 
-	return fmt.Sprintf("%s\n%s\n%s", header, body, footer)
+	// Eliminamos todos los espacios en blanco de la porción base64.
+	// Es probable que en un solo string venga así: " MIIEvQIBAD…abC...  " (con espacios intermedios).
+	onlyBase64 := strings.ReplaceAll(bodyAndExtras, " ", "")
+	onlyBase64 = strings.ReplaceAll(onlyBase64, "\t", "")
+	onlyBase64 = strings.ReplaceAll(onlyBase64, "\r", "")
+	onlyBase64 = strings.ReplaceAll(onlyBase64, "\n", "")
+
+	// Reensamblamos: header + newline + body En líneas de 64 chars + newline + footer + newline
+	var formattedBody strings.Builder
+	for i := 0; i < len(onlyBase64); i += 64 {
+		end := i + 64
+		if end > len(onlyBase64) {
+			end = len(onlyBase64)
+		}
+		formattedBody.WriteString(onlyBase64[i:end] + "\n")
+	}
+
+	return fmt.Sprintf("%s\n%s%s\n", headerMarker, formattedBody.String(), footerMarker)
 }
 
 // parseRSAPrivateKey decodifica un PEM PKCS#1 o PKCS#8 en *rsa.PrivateKey.
