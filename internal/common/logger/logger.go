@@ -10,7 +10,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const loggerKey = "logger"
+type contextKey string
+
+const loggerKey contextKey = "logger"
 
 // CustomFormatter define un formateador personalizado para logrus con colores
 type CustomFormatter struct{}
@@ -21,19 +23,23 @@ func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	sessionID, _ := entry.Data["caller_id"].(string)
 	path, _ := entry.Data["path"].(string)
 
-	// Colores ANSI para diferentes niveles
 	var levelColor string
-	switch entry.Level {
-	case logrus.DebugLevel:
-		levelColor = "\033[36m" // Cyan
-	case logrus.InfoLevel:
-		levelColor = "\033[32m" // Green
-	case logrus.WarnLevel:
-		levelColor = "\033[33m" // Yellow
-	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
-		levelColor = "\033[31m" // Red
-	default:
-		levelColor = "\033[0m" // Reset
+
+	if settings.Settings.COLORED_LOG {
+
+		// Colores ANSI para diferentes niveles
+		switch entry.Level {
+		case logrus.DebugLevel:
+			levelColor = "\033[36m" // Cyan
+		case logrus.InfoLevel:
+			levelColor = "\033[32m" // Green
+		case logrus.WarnLevel:
+			levelColor = "\033[33m" // Yellow
+		case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
+			levelColor = "\033[31m" // Red
+		default:
+			levelColor = "\033[0m" // Reset
+		}
 	}
 
 	// Crear el log con el formato especificado y colores
@@ -78,10 +84,12 @@ func WithLogger(ctx context.Context, entry *logrus.Entry) context.Context {
 
 // FromContext obtiene el logger contextualizado desde el contexto
 func FromContext(ctx context.Context) *logrus.Entry {
-	entry, ok := ctx.Value(loggerKey).(*logrus.Entry)
+	entry := ctx.Value("logger")
+
+	value, ok := entry.(*logrus.Entry)
 
 	if ok {
-		return entry
+		return value
 	}
 
 	// Si no hay logger contextualizado, devuelve el logger global

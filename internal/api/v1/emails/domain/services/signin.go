@@ -111,7 +111,7 @@ func (s *EmailsService) SignIn(
 		}
 	}
 
-	result := s.generateTokens(login, refreshs_result.Data)
+	result := s.generateTokens(ctx, login, refreshs_result.Data)
 
 	if result.Err != nil {
 		return utils.Responses[entities.SignInResponse]{
