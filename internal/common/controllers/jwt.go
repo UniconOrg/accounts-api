@@ -8,6 +8,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -20,12 +21,35 @@ type JWTController struct {
 	PublicKey  string
 }
 
+func normalizePEM(pemStr string) string {
+	// Si ya tiene saltos de línea, asumimos que está normalizado
+	if strings.Contains(pemStr, "\n") {
+		return pemStr
+	}
+
+	// Intentamos detectar si es una línea larga con espacios
+	parts := strings.Split(pemStr, " ")
+	if len(parts) < 3 {
+		// Probablemente ya esté bien o está corrupto, lo regresamos igual
+		return pemStr
+	}
+
+	header := parts[0]
+	footer := parts[len(parts)-1]
+	body := strings.Join(parts[1:len(parts)-1], "")
+
+	return fmt.Sprintf("%s\n%s\n%s", header, body, footer)
+}
+
 // parseRSAPrivateKey decodifica un PEM PKCS#1 o PKCS#8 en *rsa.PrivateKey.
 func parseRSAPrivateKey(ctx context.Context, pemStr string) (*rsa.PrivateKey, error) {
 	entry := logger.FromContext(ctx)
 	entry.Info("Parsing RSA private key")
 
-	block, _ := pem.Decode([]byte(pemStr))
+	pemStrNormalized := normalizePEM(pemStr)
+	//pemStrNormalized := pemStr
+
+	block, _ := pem.Decode([]byte(pemStrNormalized))
 	if block == nil {
 		entry.Error("Failed to decode PEM private key")
 		return nil, errors.New("no se pudo decodificar PEM de clave privada")
@@ -55,7 +79,10 @@ func parseRSAPublicKey(ctx context.Context, pemStr string) (*rsa.PublicKey, erro
 	entry := logger.FromContext(ctx)
 	entry.Info("Parsing RSA public key")
 
-	block, _ := pem.Decode([]byte(pemStr))
+	pemStrNormalized := normalizePEM(pemStr)
+	//pemStrNormalized := pemStr
+
+	block, _ := pem.Decode([]byte(pemStrNormalized))
 	if block == nil {
 		entry.Error("Failed to decode PEM public key")
 		return nil, errors.New("no se pudo decodificar PEM de clave pública")
