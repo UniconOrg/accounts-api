@@ -30,3 +30,24 @@ func (c *EmailsController) Activate(ctx *gin.Context) {
 	// Se almacena el objeto para que el middleware lo procese
 	ctx.JSON(response.StatusCode, response.ToMap())
 }
+
+func (c *EmailsController) ActivateV2(ctx *gin.Context) {
+	dto := requests.GetDTO[dtos.ActivateDTO](ctx)
+
+	entity, err := entities.NewActivateFromJSON(dto.ToJson())
+
+	if err != nil {
+		customResponse := responses.Response{
+			Status: fiber.StatusBadRequest,
+			Data:   "Error al parsear el JSON",
+		}
+
+		// Se almacena el objeto para que el middleware lo procese
+		ctx.JSON(fiber.StatusOK, customResponse)
+		return
+	}
+
+	response := c.userService.ActivateV2(ctx.Request.Context(), entity)
+	// Se almacena el objeto para que el middleware lo procese
+	ctx.JSON(response.StatusCode, response.ToMap())
+}

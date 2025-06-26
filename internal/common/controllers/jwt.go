@@ -63,6 +63,48 @@ func normalizePEM(pemStr string) string {
 	return fmt.Sprintf("%s\n%s%s\n", headerMarker, formattedBody.String(), footerMarker)
 }
 
+func normalizePEMPublicKey(pemStr string) string {
+	const headerMarker = "-----BEGIN PUBLIC KEY-----"
+	const footerMarker = "-----END PUBLIC KEY-----"
+
+	// Si ya tiene saltos de línea, asumimos que está bien.
+	if strings.Contains(pemStr, "\n") {
+		return pemStr
+	}
+
+	// Buscamos los índices exactos del encabezado y pie.
+	beginIdx := strings.Index(pemStr, headerMarker)
+	endIdx := strings.Index(pemStr, footerMarker)
+	if beginIdx == -1 || endIdx == -1 {
+		// No encontramos los marcadores completos: devolvemos tal cual.
+		return pemStr
+	}
+
+	// La parte entre headerMarker y footerMarker (excluyendo los marcadores).
+	// Nota: +len(headerMarker) avanza justo después de "-----END PRIVATE KEY-----"
+	startOfBody := beginIdx + len(headerMarker)
+	bodyAndExtras := pemStr[startOfBody:endIdx]
+
+	// Eliminamos todos los espacios en blanco de la porción base64.
+	// Es probable que en un solo string venga así: " MIIEvQIBAD…abC...  " (con espacios intermedios).
+	onlyBase64 := strings.ReplaceAll(bodyAndExtras, " ", "")
+	onlyBase64 = strings.ReplaceAll(onlyBase64, "\t", "")
+	onlyBase64 = strings.ReplaceAll(onlyBase64, "\r", "")
+	onlyBase64 = strings.ReplaceAll(onlyBase64, "\n", "")
+
+	// Reensamblamos: header + newline + body En líneas de 64 chars + newline + footer + newline
+	var formattedBody strings.Builder
+	for i := 0; i < len(onlyBase64); i += 64 {
+		end := i + 64
+		if end > len(onlyBase64) {
+			end = len(onlyBase64)
+		}
+		formattedBody.WriteString(onlyBase64[i:end] + "\n")
+	}
+
+	return fmt.Sprintf("%s\n%s%s\n", headerMarker, formattedBody.String(), footerMarker)
+}
+
 // parseRSAPrivateKey decodifica un PEM PKCS#1 o PKCS#8 en *rsa.PrivateKey.
 func parseRSAPrivateKey(ctx context.Context, pemStr string) (*rsa.PrivateKey, error) {
 	entry := logger.FromContext(ctx)
@@ -101,7 +143,7 @@ func parseRSAPublicKey(ctx context.Context, pemStr string) (*rsa.PublicKey, erro
 	entry := logger.FromContext(ctx)
 	entry.Info("Parsing RSA public key")
 
-	pemStrNormalized := normalizePEM(pemStr)
+	pemStrNormalized := normalizePEMPublicKey(pemStr)
 	//pemStrNormalized := pemStr
 
 	block, _ := pem.Decode([]byte(pemStrNormalized))
