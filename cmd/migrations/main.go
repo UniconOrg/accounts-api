@@ -7,6 +7,7 @@ import (
 	login_methods "accounts/internal/db/postgres/login_methods"
 	oauth_logins "accounts/internal/db/postgres/oauth_logins"
 	pending_registrations "accounts/internal/db/postgres/pending_registrations"
+	policies_pg "accounts/internal/db/postgres/policies"
 	refreshtokens "accounts/internal/db/postgres/refresh_tokens"
 	role "accounts/internal/db/postgres/role"
 	users "accounts/internal/db/postgres/users"
@@ -42,6 +43,7 @@ func main() {
 	db.AutoMigrate(&login_methods.LoginMethodModel{})
 	db.AutoMigrate(&refreshtokens.RefreshTokenModel{})
 	db.AutoMigrate(&pending_registrations.PendingRegistrationModel{})
+	db.AutoMigrate(&policies_pg.PolicyModel{})
 
 	fmt.Println("Migrations completed")
 }
