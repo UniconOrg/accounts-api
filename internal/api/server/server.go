@@ -8,6 +8,7 @@ import (
 	"accounts/internal/api/v1/pending_registrations"
 	"accounts/internal/api/v1/policies"
 	refreshtokens "accounts/internal/api/v1/refresh_tokens"
+	"accounts/internal/api/v1/role_policies"
 	"accounts/internal/api/v1/roles"
 	"accounts/internal/api/v1/users"
 	"os"
@@ -60,5 +61,6 @@ func setUpRouter() *gin.Engine {
 	oauth_logins.SetupOAuthModule(app, db)
 	pending_registrations.SetupPendingRegistrationsModule(app, db)
 	policies.SetupPoliciesModule(app, db)
+	role_policies.SetupRolePoliciesModule(app, db)
 	return app
 }

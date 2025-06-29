@@ -10,6 +10,7 @@ import (
 	policies_pg "accounts/internal/db/postgres/policies"
 	refreshtokens "accounts/internal/db/postgres/refresh_tokens"
 	role "accounts/internal/db/postgres/role"
+	role_policies_pg "accounts/internal/db/postgres/role_policies"
 	users "accounts/internal/db/postgres/users"
 
 	"fmt"
@@ -44,6 +45,7 @@ func main() {
 	db.AutoMigrate(&refreshtokens.RefreshTokenModel{})
 	db.AutoMigrate(&pending_registrations.PendingRegistrationModel{})
 	db.AutoMigrate(&policies_pg.PolicyModel{})
+	db.AutoMigrate(&role_policies_pg.RolePoliciesModel{})
 
 	fmt.Println("Migrations completed")
 }
