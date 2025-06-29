@@ -14,6 +14,7 @@ import (
 	codes "accounts/internal/db/postgres/codes"
 	emails "accounts/internal/db/postgres/emails"
 	login_methods "accounts/internal/db/postgres/login_methods"
+	pending_registrations "accounts/internal/db/postgres/pending_registrations"
 	refresh "accounts/internal/db/postgres/refresh_tokens"
 	roles "accounts/internal/db/postgres/role"
 	users "accounts/internal/db/postgres/users"
@@ -23,6 +24,7 @@ func SetupEmailsModule(app *gin.Engine, db *gorm.DB) {
 
 	service := services.NewEmailsService(
 		emails.NewEmailPostgresRepository(db),
+		pending_registrations.NewPendingRegistrationsPostgresRepository(db),
 		users.NewUserPostgresRepository(db),
 		roles.NewRolePostgresRepository(db),
 		login_methods.NewLoginMethodPostgresRepository(db),
@@ -48,6 +50,8 @@ func SetupEmailsModule(app *gin.Engine, db *gorm.DB) {
 	group.POST("/signin/resend-code", controller.SignInResendCode)
 
 	group.POST("/activate", controller.Activate)
+	group.POST("/activate/v2", controller.ActivateV2)
+	group.POST("/activate/v2/set-password", controller.SetPassword)
 
 	group.POST("/reset", controller.ResetPassword)
 	group.POST("/reset-confirm", controller.ResetPasswordConfirm)

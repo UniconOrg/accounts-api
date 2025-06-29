@@ -17,3 +17,7 @@ type ActivateResponse struct {
 	JWT          string `json:"jwt"`
 	RefreshToken string `json:"refresh_token"`
 }
+
+type ActivateV2Response struct {
+	JWT string `json:"jwt"`
+}
